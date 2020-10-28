@@ -1,0 +1,275 @@
+swagger: "2.0"
+info:
+  description: "Listing API"
+  version: "1.0.0"
+  title: "Listing backend Service"
+host: "localhost:4000"
+basePath: "/v1"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+tags:
+- name: status
+  description: "Returns the service status"
+- name: Listing
+  description: "Listing related routes"
+- name: Etsy
+  description: "Etsy related routes"
+paths:
+  /status:
+    get:
+      tags:
+        - "Status"
+      description: "Gets the status of the service"
+      operationId: "getSystemStatus"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The server status will be returned"
+          schema:
+            $ref: "#/definitions/server_status_response"
+      x-swagger-router-controller: "Status"
+  /list:
+    get:
+      tags:
+        - Listing
+      description: "Retrieves the list that matches the passed query arguments"
+      operationId: "retrieveList"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - $ref: "#/parameters/authorization"
+        - $ref: "#/parameters/name"
+        - $ref: "#/parameters/page"
+        - $ref: "#/parameters/items_per_page"
+        - $ref: "#/parameters/sorting"
+        - $ref: "#/parameters/sort_order"
+      security:
+        - jwt: []
+      responses:
+        200:
+          description: "list matching the query"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/list_response_def"
+        204:
+          description: "No Content. Returned if no lists were found."
+      x-swagger-router-controller: "Listing"
+    post:
+      tags:
+        - Listing
+      operationId: postList
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - $ref: "#/parameters/authorization"
+        - $ref: "#/parameters/lists_body_param"
+      security:
+        - jwt: []
+      responses:
+        201:
+          description: "List content was created"
+          schema:
+            $ref: "#/definitions/list_response_def"
+      x-swagger-router-controller: "Listing"
+  /list/{list_id}:
+    parameters:
+      - $ref: "#/parameters/authorization"
+      - $ref: "#/parameters/list_id"
+    get:
+      x-swagger-router-controller: "Listing"
+      operationId: "getList"
+      security:
+        - jwt: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The updated List will be returned"
+          schema:
+            $ref: "#/definitions/list_response_def"
+      tags:
+        - Listing
+      summary: "Upsert a list content"
+    put:
+      x-swagger-router-controller: "Listing"
+      operationId: "putList"
+      security:
+        - jwt: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - $ref: "#/parameters/lists_body_param"
+      responses:
+        200:
+          description: "The updated List will be returned"
+          schema:
+            $ref: "#/definitions/list_response_def"
+      tags:
+        - Listing
+      summary: "Upsert a list content"
+    delete:
+      x-swagger-router-controller: "Listing"
+      operationId: "deleteList"
+      security:
+        - jwt: []
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The deleted List will be returned"
+          schema:
+            $ref: "#/definitions/list_response_def"
+      tags:
+        - Listing
+      summary: "deletes a list"
+parameters:
+  name:
+    name: "name"
+    in: "query"
+    description: "The name of the list to retrieve"
+    required: false
+    type: "string"
+  list_id:
+    name: list_id
+    in: path
+    required: true
+    pattern: ^[0-9a-fA-F]{24}$
+    description: "The list identifier"
+    type: string
+  page:
+    name: "page"
+    in: "query"
+    description: "The page of list to be displayed"
+    required: false
+    type: "integer"
+    default: 1
+    minimum: 1
+  items_per_page:
+    name: "items_per_page"
+    in: "query"
+    description: "The number of list per page"
+    required: false
+    type: "integer"
+    default: 10
+    minimum: 1
+    maximum: 100
+  sorting:
+    name: sort_parameter
+    in: query
+    description: "sorting parameter"
+    type: string
+    default: type
+    enum:
+      - type
+      - price
+      - title
+  sort_order:
+    name: sort_order
+    in: query
+    description: "sorting order"
+    type: integer
+    default: 1
+    enum:
+      - 1
+      - -1
+  authorization:
+    name: authorization
+    in: header
+    required: true
+    type: string
+    description: "The JWT Token"
+  lists_body_param:
+    name: list
+    in: body
+    description: "list to capture record to load"
+    schema:
+      $ref: "#/definitions/lists_body_def"
+definitions:
+  mongoose_default_fields:
+    type: object
+    required:
+      - _id
+      - updated_at
+      - created_at
+      - __v
+    properties:
+      _id:
+        type: string
+        pattern: ^[0-9a-fA-F]{24}$
+      updated_at:
+        type: string
+        format: date-time
+      created_at:
+        type: string
+        format: date-time
+      __v:
+        type: integer
+  lists_body_def:
+    required:
+      - title
+      - type
+      - price
+    properties:
+      title:
+        type: "string"
+        description: "the name of the list"
+      type:
+        type: "string"
+        description: "type of the list"
+      price:
+        type: "integer"
+        description: "price of the list"
+      description:
+        type: "string"
+        description: "the description of the list"
+  list_response_def:
+    allOf:
+    - $ref: "#/definitions/mongoose_default_fields"
+    - $ref: "#/definitions/lists_body_def"
+  server_status_response:
+    type: "object"
+    required:
+      - "up_time"
+    properties:
+      up_time:
+        type: "integer"
+  sorting_def:
+    type: "object"
+    required:
+      - "sort_parameter"
+      - "direction"
+    properties:
+      sort_parameter:
+        type: "string"
+        enum:
+          - type
+          - price
+          - title
+      direction:
+        type: 'integer'
+        enum:
+          - 1
+          - -1
+securityDefinitions:
+  jwt:
+    type: apiKey
+    name: authorization
+    in: header
