@@ -21,40 +21,17 @@ class ListService {
    * @return void
    */
   postList(req, res, next) {
-    let payload = req.swagger.params.list.value;
-    async.series({
-      findOneListRecord: (cb)=>{
-        _findOneListRecord({'title': payload['title'], 'type': payload['type']}, (err, result)=>{
-          if(err) {
-            return cb(err);
-          }
-          if(!_.isEmpty(result)) {
-            let duplicationError = {
-              code: 400,
-              message: 'There is already a list with the same type and title on record'
-            };
-            return cb(duplicationError);
-          }
-          return cb(null, result);
-        })
-      },
-      saveListRecord: (cb) => {
-        _saveListRecord(payload, (err, result)=>{
-          if(err) {
-            return cb(err);
-          }
-          return cb(null, JSON.stringify(result));
-        })
-      }
-    }, (err, results) => {
+    let lists = req.swagger.params.list.value;
+    console.log('hereeeeeeeeeeeeeeeee111', lists)
+    _saveListRecord(lists, (err, result)=>{
       if (err) {
         res.status(err.code).json(err.message);
         return next();
       }
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.end(results['saveListRecord']);
-    });
+      res.end(result);
+    })
   }
 
   /**
@@ -299,8 +276,17 @@ function _deleteListRecord(listId, callback) {
  *
  * @return void
  */
-function _saveListRecord(list, callback) {
-  let listRecord = new List(list)
+function _saveListRecord(lists, callback) {
+  console.log('hereeeeeeeeeeeeeeee',lists);
+  let listRecord =[];
+  lists.forEach((list)=>{
+    const newList = new List(list)
+    console.log('hereeeeeeeeeeeeeeee',1,newList);
+
+    listRecord.push(newList);
+  });
+  console.log('hereeeeeeeeeeeeeeee',2,listRecord);
+
   listRecord.save((err, res)=>{
     if(err) {
       let error = {

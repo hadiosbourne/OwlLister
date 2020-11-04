@@ -5,9 +5,12 @@ const Schema = mongoose.Schema;
 
 let ListSchema = new Schema(
   {
-    name: {
+    listName: {
       type: String,
       required: true
+    },
+    description: {
+      type: String
     }
   },
   {    

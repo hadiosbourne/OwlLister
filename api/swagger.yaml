@@ -74,14 +74,16 @@ paths:
         - "application/json"
       parameters:
         - $ref: "#/parameters/authorization"
-        - $ref: "#/parameters/lists_body_param"
+        - $ref: "#/parameters/lists_array_body_param"
       security:
         - jwt: []
       responses:
         201:
           description: "List content was created"
           schema:
-            $ref: "#/definitions/list_response_def"
+            type: array
+            items:
+              $ref: "#/definitions/list_response_def"
       x-swagger-router-controller: "Listing"
   /list/{list_id}:
     parameters:
@@ -100,7 +102,9 @@ paths:
         200:
           description: "The updated List will be returned"
           schema:
-            $ref: "#/definitions/list_response_def"
+            type: array
+            items:
+              $ref: "#/definitions/list_response_def"
       tags:
         - Listing
       summary: "Upsert a list content"
@@ -119,7 +123,9 @@ paths:
         200:
           description: "The updated List will be returned"
           schema:
-            $ref: "#/definitions/list_response_def"
+            type: array
+            items:
+              $ref: "#/definitions/list_response_def"
       tags:
         - Listing
       summary: "Upsert a list content"
@@ -136,7 +142,9 @@ paths:
         200:
           description: "The deleted List will be returned"
           schema:
-            $ref: "#/definitions/list_response_def"
+            type: array
+            items:
+              $ref: "#/definitions/list_response_def"
       tags:
         - Listing
       summary: "deletes a list"
@@ -176,11 +184,9 @@ parameters:
     in: query
     description: "sorting parameter"
     type: string
-    default: type
+    default: listName
     enum:
-      - type
-      - price
-      - title
+      - listName
   sort_order:
     name: sort_order
     in: query
@@ -202,6 +208,14 @@ parameters:
     description: "list to capture record to load"
     schema:
       $ref: "#/definitions/lists_body_def"
+  lists_array_body_param:
+    name: list
+    in: body
+    description: "list to capture record to load"
+    schema:
+      type: array
+      items:
+        $ref: "#/definitions/lists_body_def"
 definitions:
   mongoose_default_fields:
     type: object
@@ -224,19 +238,11 @@ definitions:
         type: integer
   lists_body_def:
     required:
-      - title
-      - type
-      - price
+      - listName
     properties:
-      title:
+      listName:
         type: "string"
         description: "the name of the list"
-      type:
-        type: "string"
-        description: "type of the list"
-      price:
-        type: "integer"
-        description: "price of the list"
       description:
         type: "string"
         description: "the description of the list"
@@ -260,9 +266,7 @@ definitions:
       sort_parameter:
         type: "string"
         enum:
-          - type
-          - price
-          - title
+          - listName
       direction:
         type: 'integer'
         enum:
