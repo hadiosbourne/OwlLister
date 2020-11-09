@@ -1,0 +1,32 @@
+{
+  "server": {
+    "port": 4000
+  },
+  "mongo": {
+    "database_host": "mongodb://localhost:27017/OwlDev",
+    "options": {
+      "config": {
+        "autoIndex": false
+      },
+      "useMongoClient": true
+    }
+  },
+  "currency_layer_config": {
+    "api_key":"15bae85955e579af68bf9da90c71ac58",
+    "url": "http://www.apilayer.net/api/live",
+    "quote_ttl": 300,
+    "currencies": [
+      "GBP",
+      "CAD",
+      "USD",
+      "EUR"
+    ]
+  },
+  "etsy_config": {
+    "api_key": "5aeeg1an0d3jmp1y6r3oz6hi",
+    "url": "https://openapi.etsy.com/v2",
+    "url_ttl": 300
+  },
+  "jwt_api_token": "WiivvEtsySecret",
+  "swagger_ui_config": {}
+}

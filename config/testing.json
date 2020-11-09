@@ -1,0 +1,30 @@
+{
+  "mocha": {
+    "reporter": "spec"
+  },  
+  "mongo": {
+    "database_host": "mongodb://localhost:27017/EtsyTesting",
+    "options": {
+      "config": {
+        "autoIndex": false
+      }
+    }
+  },
+  "currency_layer_config": {
+    "api_key":"testingSecret",
+    "url": "http://www.apilayer.net/api/live",
+    "quote_ttl": 300,
+    "currencies": [
+      "GBP",
+      "CAD",
+      "USD",
+      "EUR"
+    ]
+  },
+  "etsy_config": {
+    "api_key": "testingSecret",
+    "url": "https://openapi.etsy.com/v2",
+    "url_ttl": 300
+  },
+  "jwt_api_token": "testingSecret"
+}
